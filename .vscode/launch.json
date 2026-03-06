@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "Debug float",
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/float",
@@ -14,6 +14,13 @@
                 "-n 100",
                 "-i 5"
             ]
+        },
+        {
+            "name": "Debug",
+            "type": "cuda-gdb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/double",
+            "cwd" : "${workspaceFolder}"
         }
     ]
 }
