@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
     int thread_size{ 1024 };
     app.add_option("-t, --thread", thread_size, "number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
     // metric metric_choice = metric::avg;
-    // app.add_option("-m, --metric", metric_choice, "metric to use for performance measurement (avg or mean)")->check(CLI::IsMember({ "avg", "mean" }));
+    // app.add_option("-m, --metric", metric_choice, "metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
 
     int num_iterations{ 1 };
     app.add_option("-i, --iterations", num_iterations, "number of iterations to run for performance measurement");
