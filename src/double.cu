@@ -48,7 +48,7 @@ void save_data(const char* filename, const float* time, int N){
         printf("Could not open %s !",filename);
     }
 
-    for(int i = 0; i < N; i++){
+    for(int i = 1; i < N; i++){
         fout << i << "," << time[i] << "\n";
     }
     fout.close();
@@ -73,7 +73,7 @@ int bench_mono(float* gpu_time, const int max_size){
 
     bin_double 
         //inputs
-        a[max_size] = {0},b[max_size],
+        a[max_size],b[max_size],
         //outputs
         cpu_res[max_size], gpu_res[max_size],
         //GPU pointers
@@ -102,12 +102,12 @@ int bench_mono(float* gpu_time, const int max_size){
     CHK(cudaEventCreate(&stop_gpu));
 
     //malloc vars
-    CHK(cudaMalloc((void**) d_left,max_size*sizeof(bin_double)));
-    CHK(cudaMalloc((void**) d_right,max_size*sizeof(bin_double)));
-    CHK(cudaMalloc((void**) d_res,max_size*sizeof(bin_double)));
+    CHK(cudaMalloc((void**) &d_left,max_size*sizeof(bin_double)));
+    CHK(cudaMalloc((void**) &d_right,max_size*sizeof(bin_double)));
+    CHK(cudaMalloc((void**) &d_res,max_size*sizeof(bin_double)));
 
     //Benchmark
-    for(int array_size = 0; array_size < max_size; ++array_size){
+    for(int array_size = 1; array_size < max_size; array_size++){
 
         //threads & block sizes
         int thread_size(1024), 
@@ -120,7 +120,7 @@ int bench_mono(float* gpu_time, const int max_size){
 
         //load data for operations
         CHK(cudaMemcpy(d_left, a, vec_size,cudaMemcpyHostToDevice));
-        CHK(cudaMemcpy(d_left, b, vec_size,cudaMemcpyHostToDevice));
+        CHK(cudaMemcpy(d_right, b, vec_size,cudaMemcpyHostToDevice));
 
         //run kernel
         CHK(cudaEventRecord(start_gpu));
@@ -143,9 +143,9 @@ int bench_mono(float* gpu_time, const int max_size){
     }
 
 End:
-    free(d_left);
-    free(d_right);
-    free(d_res);
+    cudaFree(d_left);
+    cudaFree(d_right);
+    cudaFree(d_res);
 
     cudaError_t status = cudaDeviceReset();
     if(status != cudaSuccess){

@@ -8,7 +8,8 @@
             "name": "Debug",
             "type": "cuda-gdb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/double"
+            "program": "${workspaceFolder}/build/double",
+            "cwd": "${workspaceFolder}"
         }
 
     ]
