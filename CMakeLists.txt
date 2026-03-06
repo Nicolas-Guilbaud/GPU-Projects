@@ -15,5 +15,8 @@ if(ENABLE_CUDA_DEBUG)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G")
 endif()
 
-file(GLOB SOURCES "src/float.cu")
-add_executable("float" ${SOURCES})
+file(GLOB FLOAT_SOURCES "src/float.cu")
+add_executable("float" ${FLOAT_SOURCES})
+
+file(GLOB FLOAT_SOURCES "src/double.cu")
+add_executable("double" ${FLOAT_SOURCES})
