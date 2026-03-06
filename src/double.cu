@@ -1,17 +1,6 @@
-#include <stdio.h>
-#include <fstream>
 #include <bit>
-#include <bitset>
 #include <chrono>
-
-#define CHK(code) \
-do {                                                                        \
-    if ((code) != cudaSuccess) {                                            \
-        fprintf(stderr, "CUDA error: %s %s %i\n",                           \
-                        cudaGetErrorString((code)), __FILE__, __LINE__);    \
-        goto End;                                                           \
-    }                                                                       \
-} while (0)
+#include "includes/commons.h"
 
 //conversion double <-> binary
 union bin_double{
@@ -37,30 +26,12 @@ bool check_values(bin_double* cpu_res, bin_double* gpu_res, size_t N){
     return true;
 }
 
-int div_up(int a, int b){
-    return (a + b - 1)/b;
-}
-
-void save_data(const char* filename, const float* time, int N){
-    std::ofstream fout;
-    fout.open(filename);
-    if(!fout.good()){
-        printf("Could not open %s !",filename);
-    }
-
-    for(int i = 1; i < N; i++){
-        fout << i << "," << time[i] << "\n";
-    }
-    fout.close();
-
-}
-
 int bench_mono(float* gpu_time, const int max_size);
 
 int main(){
 
     //TODO: make this as args
-    const char* file_name = "output-double.csv";
+    const char* file_name = "results/output-double.csv";
     int max_size = 20;
 
     float time_array[max_size];
@@ -142,7 +113,7 @@ int bench_mono(float* gpu_time, const int max_size){
         CHK(cudaEventElapsedTime(&gpu_time[array_size],start_gpu,stop_gpu));
     }
 
-End:
+Error:
     cudaFree(d_left);
     cudaFree(d_right);
     cudaFree(d_res);

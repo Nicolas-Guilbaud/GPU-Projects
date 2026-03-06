@@ -7,13 +7,13 @@ find_package(CUDAToolkit REQUIRED)
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 
-set(CMAKE_CUDA_STANDARD 17)
-set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
 # Debug
 if(ENABLE_CUDA_DEBUG)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G")
 endif()
+
+include_directories(includes)
+
 
 file(GLOB FLOAT_SOURCES "src/float.cu")
 add_executable("float" ${FLOAT_SOURCES})
