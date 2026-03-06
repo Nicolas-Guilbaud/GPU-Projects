@@ -53,14 +53,20 @@ void main_kernel(int pre_array_size, int step_size, int tsize, metric metric_cho
         dim3 thread_size(tsize);
         int iter;
         int i;
+
         cudaEvent_t start_gpu, end_gpu;
+
         cudaEventCreate(&start_gpu);
         cudaEventCreate(&end_gpu);
+
         float gpu_runtimes[num_iterations] = { 0 };
+
         CHK(cudaSetDevice(0));
+        
         CHK(cudaMalloc((void**)&dev_c, array_size * sizeof(float)));
         CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
         CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
+
         for (iter = 0; iter < num_iterations; iter++) {
             for (i = 0; i < array_size; i++) {
                 host_a[i] = rand();
@@ -86,20 +92,20 @@ void main_kernel(int pre_array_size, int step_size, int tsize, metric metric_cho
             CHK(cudaEventSynchronize(end_gpu));
             CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
 
-        Error:
-            cudaFree(dev_c);
-            cudaFree(dev_a);
-            cudaFree(dev_b);
-
-            // cudaDeviceReset must be called before exiting in order for profiling and
-            // tracing tools such as Nsight and Visual Profiler to show complete traces.
-            if (cudaDeviceReset() != cudaSuccess)
-            {
-                output_file << "cudaDeviceReset failed!\n";
-                return;
-            }
-
         }
+    Error:
+        cudaFree(dev_c);
+        cudaFree(dev_a);
+        cudaFree(dev_b);
+
+        // cudaDeviceReset must be called before exiting in order for profiling and
+        // tracing tools such as Nsight and Visual Profiler to show complete traces.
+        if (cudaDeviceReset() != cudaSuccess)
+        {
+            output_file << "cudaDeviceReset failed!\n";
+            return;
+        }
+
         float avg_gpu_runtime = 0.0f;
         for (int iter = 0; iter < num_iterations; iter++) {
             avg_gpu_runtime += gpu_runtimes[iter];
