@@ -42,32 +42,31 @@ enum class metric {
     mean,
 };
 
-void main_kernel(int pre_array_size, int tsize, metric metric_choice, int num_iterations, char* output_filename) {
+void main_kernel(int pre_array_size, int step_size, int tsize, metric metric_choice, int num_iterations, char* output_filename) {
     std::ofstream output_file(output_filename);
-    for (int _array_size = 1; _array_size <= pre_array_size; _array_size++) {
-
+    for (int _array_size = 1; _array_size <= pre_array_size; _array_size += step_size) {
+        std::cout << "Running with array size: " << _array_size << std::endl;
         const int array_size = _array_size;
         float* dev_a = 0, * dev_b = 0, * dev_c = 0;
         float host_a[array_size], host_b[array_size], host_c[array_size];
         dim3 block_size((array_size + tsize - 1) / tsize);
         dim3 thread_size(tsize);
+        int iter;
+        int i;
         cudaEvent_t start_gpu, end_gpu;
         cudaEventCreate(&start_gpu);
         cudaEventCreate(&end_gpu);
-
         float gpu_runtimes[num_iterations] = { 0 };
-
-
-        for (int iter = 0; iter < num_iterations; iter++) {
-            for (int i = 0; i < array_size; i++) {
+        CHK(cudaSetDevice(0));
+        CHK(cudaMalloc((void**)&dev_c, array_size * sizeof(float)));
+        CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
+        CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
+        for (iter = 0; iter < num_iterations; iter++) {
+            for (i = 0; i < array_size; i++) {
                 host_a[i] = rand();
                 host_b[i] = rand();
             }
 
-            CHK(cudaSetDevice(0));
-            CHK(cudaMalloc((void**)&dev_c, array_size * sizeof(float)));
-            CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
-            CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
 
             CHK(cudaMemcpy(dev_a, host_a, array_size * sizeof(float), cudaMemcpyHostToDevice));
             CHK(cudaMemcpy(dev_b, host_b, array_size * sizeof(float), cudaMemcpyHostToDevice));
@@ -84,8 +83,8 @@ void main_kernel(int pre_array_size, int tsize, metric metric_choice, int num_it
             CHK(cudaMemcpy(host_c, dev_c, array_size * sizeof(float), cudaMemcpyDeviceToHost));
 
             // Make sure the stop_gpu event is recorded before doing the time computation
-            cudaEventSynchronize(end_gpu);
-            cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu);
+            CHK(cudaEventSynchronize(end_gpu));
+            CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
 
         Error:
             cudaFree(dev_c);
@@ -97,7 +96,9 @@ void main_kernel(int pre_array_size, int tsize, metric metric_choice, int num_it
             if (cudaDeviceReset() != cudaSuccess)
             {
                 output_file << "cudaDeviceReset failed!\n";
+                return;
             }
+
         }
         float avg_gpu_runtime = 0.0f;
         for (int iter = 0; iter < num_iterations; iter++) {
@@ -115,6 +116,9 @@ int main(int argc, char** argv) {
     int pre_array_size{ 1 };
     app.add_option("-n, --number", pre_array_size, "upper bound on the array size(default is 1)")->check(CLI::PositiveNumber);
 
+    int step_size{ 1 };
+    app.add_option("-s, --step", step_size, "step size for array size (default is 1)")->check(CLI::PositiveNumber);
+
     int thread_size{ 1024 };
     app.add_option("-t, --thread", thread_size, "number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
     // metric metric_choice = metric::avg;
@@ -127,6 +131,6 @@ int main(int argc, char** argv) {
     app.add_option("-o, --output", output_filename, "output file name for performance results");
 
     CLI11_PARSE(app, argc, argv);
-    main_kernel(pre_array_size, thread_size, metric::avg, num_iterations, output_filename.data());
+    main_kernel(pre_array_size, step_size, thread_size, metric::avg, num_iterations, output_filename.data());
     return 0;
 }

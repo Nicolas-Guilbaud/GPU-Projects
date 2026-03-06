@@ -8,8 +8,8 @@
             "name": "Debug",
             "type": "cuda-gdb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/output"
+            "program": "${workspaceFolder}/build/float",
+            "args": "-n 100 -i 5"
         }
-
     ]
 }
