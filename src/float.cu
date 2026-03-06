@@ -16,7 +16,20 @@ union bin_float {
 bool checkCuda(int* out_cpu, int* out_gpu, int N);
 
 
-__global__ void float_bitwiseXOR_kernel(float* c, const float* a, const float* b, int N) {
+__global__ void float_bitwiseXOR_kernel(float* c, const float* a, const float* b, const int N, const int J) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    for (int j = 0; j < J; j++) {
+        if (idx + j < N) {
+            bin_float bin_a, bin_b, bin_c;
+            bin_a.f = a[idx + j];
+            bin_b.f = b[idx + j];
+            bin_c.u = bin_a.u ^ bin_b.u;
+            c[idx + j] = bin_c.f;
+        }
+    }
+}
+
+__global__ void float_bitwiseXOR_kernel(float* c, const float* a, const float* b, const int N) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N) {
         bin_float bin_a, bin_b, bin_c;
@@ -27,22 +40,22 @@ __global__ void float_bitwiseXOR_kernel(float* c, const float* a, const float* b
     }
 }
 
-float probe_kernel_mono(int array_size, int thread_nb, metric metric_choice, int nb_iterations){
-    
-    float 
+float probe_kernel_mono(int array_size, int thread_nb, metric metric_choice, int nb_iterations, int J) {
+
+    float
         //GPU arrays
-        *dev_a = 0, * dev_b = 0, * dev_c = 0,
+        * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
         host_a[array_size], host_b[array_size], host_c[array_size],
         //array of time
         gpu_runtimes[nb_iterations];
+    int group_thread_nb = div_up(thread_nb, J);
 
-    dim3 block_size(div_up(array_size,thread_nb));
-    dim3 thread_size(thread_nb);
+
+    dim3 block_size(div_up(array_size, thread_nb));
+    dim3 thread_size(group_thread_nb);
 
     cudaEvent_t start_gpu, end_gpu;
-
-    float results = 0;
 
     cudaEventCreate(&start_gpu);
     cudaEventCreate(&end_gpu);
@@ -53,7 +66,7 @@ float probe_kernel_mono(int array_size, int thread_nb, metric metric_choice, int
     CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
     CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
 
-    for(int iter = 0; iter < nb_iterations; iter++){
+    for (int iter = 0; iter < nb_iterations; iter++) {
 
         for (int i = 0; i < array_size; i++) {
             host_a[i] = rand();
@@ -64,7 +77,7 @@ float probe_kernel_mono(int array_size, int thread_nb, metric metric_choice, int
         CHK(cudaMemcpy(dev_b, host_b, array_size * sizeof(float), cudaMemcpyHostToDevice));
 
         cudaEventRecord(start_gpu);
-        float_bitwiseXOR_kernel<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size);
+        float_bitwiseXOR_kernel << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size, J);
         cudaEventRecord(end_gpu);
 
         CHK(cudaGetLastError());
@@ -84,27 +97,33 @@ Error:
     cudaFree(dev_a);
     cudaFree(dev_b);
 
-    return compute_metric(metric_choice,gpu_runtimes,nb_iterations);
+    cudaError_t status = cudaGetLastError();
+    if (status != cudaSuccess) {
+        fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(status));
+    }
+
+    return compute_metric(metric_choice, gpu_runtimes, nb_iterations);
 
 }
 
 void benchmark_mono(
-    int max_size, 
-    int steps, 
-    int thread_size, 
-    metric choice, 
-    int nb_iter, 
-    const char* filename
-){
+    int max_size,
+    int steps,
+    int thread_size,
+    metric choice,
+    int nb_iter,
+    const char* filename,
+    int J
+) {
 
     float results[max_size];
 
-    for(int i = 1; i < max_size; i+=steps){
+    for (int i = 1; i < max_size; i += steps) {
         //benchmark_kernel
-        results[i] = probe_kernel_mono(i,thread_size,choice,nb_iter);
+        results[i] = probe_kernel_mono(i, thread_size, choice, nb_iter, J);
     }
 
-    save_data(filename,results,max_size);
+    save_data(filename, results, max_size);
 }
 
 
@@ -124,11 +143,14 @@ int main(int argc, char** argv) {
     int num_iterations{ 1 };
     app.add_option("-i, --iterations", num_iterations, "number of iterations to run for performance measurement");
 
+    int J{ 1 };
+    app.add_option("-j, --J", J, "Size of the number of operations to perform in the kernel (default is 1)")->check(CLI::PositiveNumber);
+
     std::string output_filename = "float_output.csv";
     app.add_option("-o, --output", output_filename, "output file name for performance results");
 
     CLI11_PARSE(app, argc, argv);
 
-    benchmark_mono(pre_array_size, step_size, thread_size, metric::avg, num_iterations, output_filename.data());
+    benchmark_mono(pre_array_size, step_size, thread_size, metric::avg, num_iterations, output_filename.data(), J);
     return 0;
 }
