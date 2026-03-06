@@ -9,7 +9,11 @@
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/float",
-            "args": "-n 100 -i 5"
+            "cwd" : "${workspaceFolder}",
+            "args": [
+                "-n 100",
+                "-i 5"
+            ]
         }
     ]
 }
