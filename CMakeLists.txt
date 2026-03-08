@@ -13,6 +13,7 @@ if(ENABLE_CUDA_DEBUG)
 endif()
 
 include_directories(includes)
+include_directories(doubles)
 
 
 file(GLOB FLOAT_SOURCES "src/float.cu")

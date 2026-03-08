@@ -57,4 +57,5 @@ float compute_metric(metric choice, float* values, size_t nb_iter) {
     case metric::median:
         return compute_median(values, nb_iter);
     }
+    return 0;
 }
