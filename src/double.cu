@@ -1,6 +1,7 @@
 #include <bit>
 #include <chrono>
 #include "doubles/benchmark_mono.cu"
+#include "doubles/multiple_elems.cu"
 #include <CLI/CLI.hpp>
 
 int main(int argc, char** argv){
@@ -24,6 +25,8 @@ int main(int argc, char** argv){
     CLI11_PARSE(app, argc, argv);
 
     //TODO: make this as args
-    benchmark_mono(max_size,step_size,thread_size,metric::avg,num_iterations,file_name.data());
+    //benchmark_mono(max_size,step_size,thread_size,metric::avg,num_iterations,file_name.data());
+    benchmark_multiple(500,thread_size,500,metric::avg,5,"doubles-multiple.csv");
+
     return 0;
 }

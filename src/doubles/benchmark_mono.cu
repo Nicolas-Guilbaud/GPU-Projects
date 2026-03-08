@@ -3,12 +3,6 @@
 #include "../includes/commons.h"
 #include <CLI/CLI.hpp>
 
-//conversion double <-> binary
-union bin_double{
-    double value;
-    u_int64_t binary;
-};
-
 /**
  * Compute binary operations as doubles (1 double/thread)
  */
@@ -19,17 +13,20 @@ __global__ void xor_double(bin_double* res, bin_double* left, bin_double* right,
     }
 }
 
+/**
+ * executes the kernel for a fixed array size and measure the time 
+ * required to complete the computation.
+ * 
+ */
 float probe_kernel_mono(int array_size, int thread_nb, metric choice, int nb_iterations){
 
     bin_double 
-        //inputs
-        a[array_size],b[array_size],
-        //outputs
-        cpu_res[array_size], gpu_res[array_size],
+        //inputs & outputs
+        a[array_size],b[array_size], gpu_res[array_size],
         //GPU pointers
         *d_left, *d_right, *d_res;
 
-    float gpu_time[array_size];
+    float gpu_time[nb_iterations];
 
     //threads & block sizes
     dim3 thread_size(thread_nb), 
