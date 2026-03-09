@@ -2,7 +2,7 @@
 #include <chrono>
 #include "doubles/benchmark_mono.cu"
 #include "doubles/multiple_elems.cu"
-#include <CLI/CLI.hpp>
+#include "includes/CLI11.hpp"
 
 int main(int argc, char** argv){
 
@@ -26,7 +26,7 @@ int main(int argc, char** argv){
 
     //TODO: make this as args
     //benchmark_mono(max_size,step_size,thread_size,metric::avg,num_iterations,file_name.data());
-    benchmark_multiple(500,thread_size,500,metric::avg,5,"doubles-multiple.csv");
+    benchmark_multiple(5000,thread_size,5000,metric::avg,5,"doubles-multiple.csv");
 
     return 0;
 }

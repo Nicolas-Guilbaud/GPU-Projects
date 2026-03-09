@@ -12,6 +12,7 @@ if(ENABLE_CUDA_DEBUG)
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G")
 endif()
 
+#CLI
 include_directories(includes)
 include_directories(doubles)
 
