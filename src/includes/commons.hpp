@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <fstream>
+#include <utility>
 
 #define CHK(code)                                                    \
     do                                                               \
@@ -18,9 +19,27 @@ int div_up(int a, int b) {
     return (a + b - 1) / b;
 }
 
-enum class metric {
+enum class Metric {
     avg,
     median,
+};
+
+
+class DataPoint {
+public:
+    float value;
+    int array_size;
+    int J;
+
+    DataPoint() = default;
+
+    DataPoint(float value, int array_size, int J)
+        : value(value), array_size(array_size), J(J) {
+    }
+
+    std::string to_csv() const {
+        return std::to_string(array_size) + "," + std::to_string(J) + "," + std::to_string(value);
+    };
 };
 
 void save_data(const char* filename, const float* time, int N) {
@@ -37,24 +56,47 @@ void save_data(const char* filename, const float* time, int N) {
 
 }
 
+void save_data(const char* filename, const DataPoint* time, int N) {
+    std::ofstream fout;
+    fout.open(filename);
+    if (!fout.good()) {
+        printf("Could not open %s !", filename);
+    }
+
+    for (int i = 0; i < N; i++) {
+        fout << time[i].to_csv() << "\n";
+    }
+    fout.close();
+
+}
+
 //FIXME: must be implemented
 float compute_median(float* values, size_t nb_iter) {
-    return 0;
+    int mid = nb_iter / 2;
+    if (nb_iter % 2 == 0) {
+        return (values[mid - 1] + values[mid]) / 2.0;
+    }
+    else {
+        return values[mid];
+    }
 }
 
 float compute_avg(float* values, size_t nb_iter) {
     float res = 0;
-    for (int i = 0; i < nb_iter; i++) {
+    for (size_t i = 0; i < nb_iter; i++) {
         res += values[i];
     }
     return res / nb_iter;
 }
 
-float compute_metric(metric choice, float* values, size_t nb_iter) {
+float compute_metric(Metric choice, float* values, size_t nb_iter) {
     switch (choice) {
-    case metric::avg:
+    case Metric::avg:
         return compute_avg(values, nb_iter);
-    case metric::median:
+    case Metric::median:
         return compute_median(values, nb_iter);
+    default:
+        return 0.0;
     }
+    return 0.0;
 }

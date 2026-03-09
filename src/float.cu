@@ -2,7 +2,7 @@
 #include "device_launch_parameters.h"
 
 #include <iostream>
-#include "includes/commons.h"
+#include "includes/commons.hpp"
 #include <CLI/CLI.hpp>
 
 using std::rand;
@@ -40,7 +40,7 @@ __global__ void float_bitwiseXOR_kernel(float* c, const float* a, const float* b
     }
 }
 
-float probe_kernel_mono(int array_size, int thread_nb, metric metric_choice, int nb_iterations, int J) {
+float probe_kernel_mono(int array_size, int thread_nb, Metric metric_choice, int nb_iterations, int J) {
 
     float
         //GPU arrays
@@ -110,20 +110,20 @@ void benchmark_mono(
     int max_size,
     int steps,
     int thread_size,
-    metric choice,
+    Metric choice,
     int nb_iter,
     const char* filename,
     int J
 ) {
 
-    float results[max_size];
+    DataPoint data[max_size * J];
 
     for (int i = 1; i < max_size; i += steps) {
-        //benchmark_kernel
-        results[i] = probe_kernel_mono(i, thread_size, choice, nb_iter, J);
+        for (int j = 1; j < J; j++) {
+            data[i * J + j] = DataPoint(probe_kernel_mono(i, thread_size, choice, nb_iter, J), i, j);
+        }
     }
-
-    save_data(filename, results, max_size);
+    save_data(filename, data, max_size * J);
 }
 
 
@@ -137,8 +137,8 @@ int main(int argc, char** argv) {
 
     int thread_size{ 1024 };
     app.add_option("-t, --thread", thread_size, "number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
-    // metric metric_choice = metric::avg;
-    // app.add_option("-m, --metric", metric_choice, "metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
+    // Metric metric_choice = Metric::avg;
+    // app.add_option("-m, --Metric", metric_choice, "Metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
 
     int num_iterations{ 1 };
     app.add_option("-i, --iterations", num_iterations, "number of iterations to run for performance measurement");
@@ -151,6 +151,6 @@ int main(int argc, char** argv) {
 
     CLI11_PARSE(app, argc, argv);
 
-    benchmark_mono(pre_array_size, step_size, thread_size, metric::avg, num_iterations, output_filename.data(), J);
+    benchmark_mono(pre_array_size, step_size, thread_size, Metric::avg, num_iterations, output_filename.data(), J);
     return 0;
 }
