@@ -15,6 +15,13 @@
         }                                                            \
     } while (0)
 
+
+const int DEFAULT_ARRAY_SIZE = 1024,
+    DEFAULT_THREAD_SIZE = 1024,
+    DEFAULT_J = 1,
+    DEFAULT_ITERATIONS = 1,
+    DEFAULT_K = 1;
+
 /**
  *  Upper bound division
  */
@@ -75,7 +82,9 @@ void save_data(const char* filename, const DataPoint* time, int N) {
 
 }
 
-//FIXME: must be implemented
+/**
+ * Computes the median value of an array
+ */
 float compute_median(float* values, size_t nb_iter) {
     int mid = nb_iter / 2;
     if (nb_iter % 2 == 0) {
@@ -112,8 +121,3 @@ float compute_metric(Metric choice, float* values, size_t nb_iter) {
     return 0.0f;
 }
 
-//conversion double <-> binary
-union bin_double{
-    double value;
-    u_int64_t binary;
-};

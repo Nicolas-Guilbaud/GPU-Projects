@@ -16,10 +16,7 @@ endif()
 
 #CLI
 include_directories(BEFORE "extern")
-
-include_directories(BEFORE "src/includes")
-include_directories(BEFORE "src/double")
-include_directories(BEFORE "src/float")
+include_directories(BEFORE "src")
 
 
 file(GLOB FLOAT_SOURCES "src/main.cu")

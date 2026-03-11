@@ -1,38 +1,79 @@
 #include <bit>
 #include <chrono>
-#include "double/benchmark_mono.cu"
-#include "double/multiple_elems.cu"
+#include "float/float.cu"
+#include "double/double.cu"
 #include "CLI11.hpp"
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
 
-    int max_size = 1;
-    int step_size= 1;
-    int thread_size = 1024;
-    int num_iterations = 1;
-    data_type type = data_type::DOUBLE;
-    metric metric_choice = metric::avg;
-
-    std::string file_name = "./results/output-double.csv";
 
     CLI::App app{ "Bitwise XOR" };
-    app.add_option("-n, --number", max_size, "upper bound on the array size(default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("-s, --step", step_size, "step size for array size (default is 1)")->check(CLI::PositiveNumber);
+
+    bool is_double,
+        is_float;
+    
+    int max_array_size = 1,
+        step_size = 1,
+        step_j = 1,
+        step_k = 1,
+        thread_size = DEFAULT_THREAD_SIZE,
+        num_iterations = DEFAULT_ITERATIONS,
+        J = DEFAULT_J,
+        K = DEFAULT_K;
+        
+    std::string output_filename = "output";
+    Metric metric_choice = Metric::avg;
+    
     app.add_option("-t, --thread", thread_size, "number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
-    app.add_option("-m, --metric", metric_choice, "metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
+    app.add_option("-m, --Metric", metric_choice, "Metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
+    
+    app.add_option("-n, --max_value", max_array_size, "upper bound on the array size(default is 1)")->check(CLI::PositiveNumber);
     app.add_option("-i, --iterations", num_iterations, "number of iterations to run for performance measurement");
-    app.add_option("-o, --output", file_name, "output file name for performance results");
-    // FIXME !
-    // app.add_option("-d","--data-type", type,"type of the data to run")->check(CLI::IsMember({"DOUBLE", "FLOAT"}));
+    app.add_option("-j, --J", J, "Size of the number of operations to perform in the kernel (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("-k, --K", K, "Size of the number of operations to perform in the kernel (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("-o, --output", output_filename, "output file name for performance results");
+    
+    app.add_option("-s, --step", step_size, "step size for array size (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("--step_j", step_j, "step size for j size (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("--step_k", step_k, "step size for k size (default is 1)")->check(CLI::PositiveNumber);
+    
+
+    app.add_flag("-d, --double", is_double, "Run the benchmarks with the double data type");
+    app.add_flag("-f, --float", is_float, "Run the benchmarks with the float data type");
 
     CLI11_PARSE(app, argc, argv);
 
-    //TODO: make this as args
-    //benchmark_mono(max_size,step_size,thread_size,metric::avg,num_iterations,file_name.data());
-    benchmark_multiple(5000,thread_size,5000,metric::avg,5,"doubles-multiple.csv");
+    if(!is_float && !is_double){
+        printf("Please choose a correct data type: -d | -f");
+        return 1;
+    }
 
-    //Float
-    //benchmark_mono(max_size, step_size, thread_size, metric::avg, num_iterations, file_name.data());
-
+    if(is_float){
+        std::string float_filename = "float_";
+        float_filename.append(output_filename);
+        if (max_array_size > 1) {
+            benchmark_varsize_float(max_array_size, step_size, thread_size, metric_choice, num_iterations, float_filename.data());
+        }
+        if (J > 1) {
+            benchmark_varj_float(J, step_j, thread_size, metric_choice, num_iterations, float_filename.data());
+        }
+        if (K > 1) {
+            benchmark_vark_float(K, step_k, thread_size, metric_choice, num_iterations, float_filename.data());
+        }
+    }
+    
+    if(is_double){
+        std::string double_filename = "double_";
+        double_filename.append(output_filename);
+        if (max_array_size > 1) {
+            benchmark_varsize_double(max_array_size, step_size, thread_size, metric_choice, num_iterations, double_filename.data());
+        }
+        if (J > 1) {
+            benchmark_varj_double(J, step_j, thread_size, metric_choice, num_iterations, double_filename.data());
+        }
+        if (K > 1) {
+            benchmark_vark_double(K, step_k, thread_size, metric_choice, num_iterations, double_filename.data());
+        }
+    }
     return 0;
 }

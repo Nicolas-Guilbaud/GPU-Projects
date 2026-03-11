@@ -3,21 +3,24 @@
 
 #include <iostream>
 #include "includes/commons.hpp"
-#include "float/kernels.cu"
+#include "double/kernels.cu"
 
 using std::rand;
 
+float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, int nb_iterations, int J, int K) {
 
-float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_iterations, int J, int K) {
-
-    float
+    bin_double
         //GPU arrays
         * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
-        host_a[array_size], host_b[array_size], host_c[array_size],
-        //array of time
-        gpu_runtimes[nb_iterations];
+        host_a[array_size], host_b[array_size], host_c[array_size];
+    
+    //array of time
+    float gpu_runtimes[nb_iterations];
+
     int group_thread_nb = div_up(thread_nb, J);
+    size_t vec_size = array_size * sizeof(float);
+
 
     dim3 block_size(div_up(array_size, thread_nb));
     dim3 thread_size(group_thread_nb);
@@ -29,32 +32,32 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
 
     CHK(cudaSetDevice(0));
 
-    CHK(cudaMalloc((void**)&dev_c, array_size * sizeof(float)));
-    CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
-    CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
+    CHK(cudaMalloc((void**)&dev_c, vec_size));
+    CHK(cudaMalloc((void**)&dev_a, vec_size));
+    CHK(cudaMalloc((void**)&dev_b, vec_size));
 
     for (int iter = 0; iter < nb_iterations; iter++) {
 
         for (int i = 0; i < array_size; i++) {
-            host_a[i] = rand();
-            host_b[i] = rand();
+            host_a[i].value = static_cast<double>(rand());
+            host_b[i].value = static_cast<double>(rand());
         }
 
-        CHK(cudaMemcpy(dev_a, host_a, array_size * sizeof(float), cudaMemcpyHostToDevice));
-        CHK(cudaMemcpy(dev_b, host_b, array_size * sizeof(float), cudaMemcpyHostToDevice));
+        CHK(cudaMemcpy(dev_a, host_a, vec_size, cudaMemcpyHostToDevice));
+        CHK(cudaMemcpy(dev_b, host_b, vec_size, cudaMemcpyHostToDevice));
         if (J > 1) {
             cudaEventRecord(start_gpu);
-            float_bitwiseXOR_kernel_j<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, J);
+            xor_double_multiple<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, J);
             cudaEventRecord(end_gpu);
         }
         else if (K > 1) {
             cudaEventRecord(start_gpu);
-            float_bitwiseXOR_kernel_k << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size, K);
+            xor_double_repeated<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, K);
             cudaEventRecord(end_gpu);
         }
         else {
             cudaEventRecord(start_gpu);
-            float_bitwiseXOR_kernel << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size);
+            xor_double_mono<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size);
             cudaEventRecord(end_gpu);
         }
 
@@ -63,7 +66,7 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         // cudaDeviceSynchronize waits for the kernel to finish, and returns
         // any errors encountered during the launch.
         CHK(cudaDeviceSynchronize());
-        CHK(cudaMemcpy(host_c, dev_c, array_size * sizeof(float), cudaMemcpyDeviceToHost));
+        CHK(cudaMemcpy(host_c, dev_c, vec_size, cudaMemcpyDeviceToHost));
 
         // Make sure the stop_gpu event is recorded before doing the time computation
         CHK(cudaEventSynchronize(end_gpu));
@@ -84,7 +87,7 @@ Error:
 
 }
 
-void benchmark_varsize_float(
+void benchmark_varsize_double(
     int max_size,
     int steps,
     int thread_size,
@@ -96,13 +99,13 @@ void benchmark_varsize_float(
     DataPoint data[max_size];
 
     for (int i = 1; i < max_size; i += steps) {
-        data[i] = DataPoint(probe_kernel(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K), i);
+        data[i] = DataPoint(probe_kernel_double(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K), i);
     }
     const char* renamed_filename = std::string(filename).append("_varsize.csv").data();
     save_data(renamed_filename, data, max_size);
 }
 
-void benchmark_varj_float(
+void benchmark_varj_double(
     int J,
     int steps,
     int thread_size,
@@ -114,13 +117,13 @@ void benchmark_varj_float(
     DataPoint data[J];
 
     for (int j = 1; j < J; j += steps) {
-        data[j] = DataPoint(probe_kernel(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K), j);
+        data[j] = DataPoint(probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K), j);
     }
     const char* renamed_filename = std::string(filename).append("_varj.csv").data();
     save_data(renamed_filename, data, J);
 }
 
-void benchmark_vark_float(
+void benchmark_vark_double(
     int K,
     int steps,
     int thread_size,
@@ -132,7 +135,7 @@ void benchmark_vark_float(
     DataPoint data[K];
 
     for (int k = 1; k < K; k += steps) {
-        data[k] = DataPoint(probe_kernel(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k), k);
+        data[k] = DataPoint(probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k), k);
     }
     const char* renamed_filename = std::string(filename).append("_vark.csv").data();
     save_data(renamed_filename, data, K);

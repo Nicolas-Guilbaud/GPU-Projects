@@ -1,6 +1,12 @@
 #include <bit>
 #include <chrono>
-#include "commons.h"
+#include "includes/commons.hpp"
+
+//conversion double <-> binary
+union bin_double{
+    double value;
+    u_int64_t binary;
+};
 
 /**
  * Compute 1 binary operatio as double, 1 element/thread)

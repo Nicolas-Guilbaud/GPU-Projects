@@ -5,22 +5,46 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug float",
+            "name": "Benchmark float",
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
-                "-n 100",
-                "-i 5"
+                "-n 1000",
+                "-i 5",
+                "-j 128",
+                "-k 128",
+                "-f"
             ]
         },
         {
-            "name": "Debug double",
+            "name": "Benchmark double",
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/main",
-            "cwd" : "${workspaceFolder}"
+            "cwd" : "${workspaceFolder}",
+            "args": [
+                "-n 1000",
+                "-i 5",
+                "-j 128",
+                "-k 128",
+                "-d"
+            ]
+        },
+        {
+            "name": "Benchmark All",
+            "type": "cuda-gdb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/main",
+            "cwd" : "${workspaceFolder}",
+            "args": [
+                "-n 1000",
+                "-i 5",
+                "-j 128",
+                "-k 128",
+                "-fd",
+            ]
         }
     ]
 }
