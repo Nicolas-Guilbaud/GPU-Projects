@@ -9,7 +9,7 @@ def plot_data(filename: str, xlabel:str, title:str):
     
     # Plotting
     plt.figure(figsize=(10, 6))
-    plt.plot(data[xlabel], data['Time'], marker='o')
+    plt.plot(data[xlabel], data['Time'])
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel('Time (ms)')

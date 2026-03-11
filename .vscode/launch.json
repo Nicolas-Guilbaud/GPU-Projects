@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
-                "-n 1000",
+                "-n 5000",
                 "-i 5",
                 "-j 128",
                 "-k 128",
@@ -25,7 +25,7 @@
             "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
-                "-n 1000",
+                "-n 5000",
                 "-i 5",
                 "-j 128",
                 "-k 128",
@@ -39,7 +39,7 @@
             "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
-                "-n 1000",
+                "-n 5000",
                 "-i 5",
                 "-j 128",
                 "-k 128",
