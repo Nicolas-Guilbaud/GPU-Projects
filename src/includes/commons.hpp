@@ -27,18 +27,17 @@ enum class Metric {
 
 class DataPoint {
 public:
-    float value;
-    int array_size;
-    int J;
+    float y;
+    int x;
 
     DataPoint() = default;
 
-    DataPoint(float value, int array_size, int J)
-        : value(value), array_size(array_size), J(J) {
+    DataPoint(float value, int x_axis)
+        : y(value), x(x_axis) {
     }
 
     std::string to_csv() const {
-        return std::to_string(array_size) + "," + std::to_string(J) + "," + std::to_string(value);
+        return std::to_string(y) + "," + std::to_string(x);
     };
 };
 
