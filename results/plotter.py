@@ -14,7 +14,7 @@ def plot_data(filename: str, xlabel:str, title:str):
     plt.xlabel(xlabel)
     plt.ylabel('Time (ms)')
     plt.grid(True)
-    plt.savefig(filename.replace('.csv', '.png'))
+    plt.savefig(full_path.replace('.csv', '.png'))
     plt.show()
     
 if __name__ == "__main__":
