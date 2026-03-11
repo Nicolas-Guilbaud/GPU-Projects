@@ -13,12 +13,12 @@ if(ENABLE_CUDA_DEBUG)
 endif()
 
 #CLI
-include_directories(includes)
-include_directories(doubles)
+include_directories(BEFORE "extern")
+
+include_directories(BEFORE "src/includes")
+include_directories(BEFORE "src/double")
+include_directories(BEFORE "src/float")
 
 
-file(GLOB FLOAT_SOURCES "src/float.cu")
-add_executable("float" ${FLOAT_SOURCES})
-
-file(GLOB FLOAT_SOURCES "src/double.cu")
-add_executable("double" ${FLOAT_SOURCES})
+file(GLOB FLOAT_SOURCES "src/main.cu")
+add_executable("main" ${FLOAT_SOURCES})

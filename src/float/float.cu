@@ -106,29 +106,3 @@ void benchmark_mono(
 
     save_data(filename,results,max_size);
 }
-
-
-int main(int argc, char** argv) {
-    CLI::App app{ "Float Bitwise XOR" };
-    int pre_array_size{ 1 };
-    app.add_option("-n, --number", pre_array_size, "upper bound on the array size(default is 1)")->check(CLI::PositiveNumber);
-
-    int step_size{ 1 };
-    app.add_option("-s, --step", step_size, "step size for array size (default is 1)")->check(CLI::PositiveNumber);
-
-    int thread_size{ 1024 };
-    app.add_option("-t, --thread", thread_size, "number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
-    // metric metric_choice = metric::avg;
-    // app.add_option("-m, --metric", metric_choice, "metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
-
-    int num_iterations{ 1 };
-    app.add_option("-i, --iterations", num_iterations, "number of iterations to run for performance measurement");
-
-    std::string output_filename = "float_output.csv";
-    app.add_option("-o, --output", output_filename, "output file name for performance results");
-
-    CLI11_PARSE(app, argc, argv);
-
-    benchmark_mono(pre_array_size, step_size, thread_size, metric::avg, num_iterations, output_filename.data());
-    return 0;
-}

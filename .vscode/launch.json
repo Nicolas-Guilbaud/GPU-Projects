@@ -8,7 +8,7 @@
             "name": "Debug float",
             "type": "cuda-gdb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/float",
+            "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
                 "-n 100",
@@ -19,7 +19,7 @@
             "name": "Debug double",
             "type": "cuda-gdb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/double",
+            "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}"
         }
     ]

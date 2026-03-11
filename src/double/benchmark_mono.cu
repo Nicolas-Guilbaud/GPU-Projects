@@ -1,6 +1,6 @@
 #include <bit>
 #include <chrono>
-#include "../includes/commons.h"
+#include "commons.h"
 
 /**
  * Compute binary operations as doubles (1 double/thread)
