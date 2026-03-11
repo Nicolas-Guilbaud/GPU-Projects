@@ -49,30 +49,31 @@ int main(int argc, char** argv) {
     }
 
     if(is_float){
-        std::string float_filename = "float_";
+        std::string float_filename = "results/float_";
         float_filename.append(output_filename);
+        printf("File: %s\n",float_filename.c_str());
         if (max_array_size > 1) {
-            benchmark_varsize_float(max_array_size, step_size, thread_size, metric_choice, num_iterations, float_filename.data());
+            benchmark_varsize_float(max_array_size, step_size, thread_size, metric_choice, num_iterations, float_filename);
         }
         if (J > 1) {
-            benchmark_varj_float(J, step_j, thread_size, metric_choice, num_iterations, float_filename.data());
+            benchmark_varj_float(J, step_j, thread_size, metric_choice, num_iterations, float_filename);
         }
         if (K > 1) {
-            benchmark_vark_float(K, step_k, thread_size, metric_choice, num_iterations, float_filename.data());
+            benchmark_vark_float(K, step_k, thread_size, metric_choice, num_iterations, float_filename);
         }
     }
     
     if(is_double){
-        std::string double_filename = "double_";
+        std::string double_filename = "results/double_";
         double_filename.append(output_filename);
         if (max_array_size > 1) {
-            benchmark_varsize_double(max_array_size, step_size, thread_size, metric_choice, num_iterations, double_filename.data());
+            benchmark_varsize_double(max_array_size, step_size, thread_size, metric_choice, num_iterations, double_filename);
         }
         if (J > 1) {
-            benchmark_varj_double(J, step_j, thread_size, metric_choice, num_iterations, double_filename.data());
+            benchmark_varj_double(J, step_j, thread_size, metric_choice, num_iterations, double_filename);
         }
         if (K > 1) {
-            benchmark_vark_double(K, step_k, thread_size, metric_choice, num_iterations, double_filename.data());
+            benchmark_vark_double(K, step_k, thread_size, metric_choice, num_iterations, double_filename);
         }
     }
     return 0;

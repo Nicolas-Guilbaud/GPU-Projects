@@ -93,7 +93,7 @@ void benchmark_varsize_double(
     int thread_size,
     Metric choice,
     int nb_iter,
-    const char* filename
+    std::string filename
 ) {
 
     DataPoint data[max_size];
@@ -101,7 +101,7 @@ void benchmark_varsize_double(
     for (int i = 1; i < max_size; i += steps) {
         data[i] = DataPoint(probe_kernel_double(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K), i);
     }
-    const char* renamed_filename = std::string(filename).append("_varsize.csv").data();
+    std::string renamed_filename = std::string(filename).append("_varsize.csv");
     save_data(renamed_filename, data, max_size);
 }
 
@@ -111,7 +111,7 @@ void benchmark_varj_double(
     int thread_size,
     Metric choice,
     int nb_iter,
-    const char* filename
+    std::string filename
 ) {
 
     DataPoint data[J];
@@ -119,7 +119,7 @@ void benchmark_varj_double(
     for (int j = 1; j < J; j += steps) {
         data[j] = DataPoint(probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K), j);
     }
-    const char* renamed_filename = std::string(filename).append("_varj.csv").data();
+    std::string renamed_filename = std::string(filename).append("_varj.csv");
     save_data(renamed_filename, data, J);
 }
 
@@ -129,7 +129,7 @@ void benchmark_vark_double(
     int thread_size,
     Metric choice,
     int nb_iter,
-    const char* filename
+    std::string filename
 ) {
 
     DataPoint data[K];
@@ -137,6 +137,6 @@ void benchmark_vark_double(
     for (int k = 1; k < K; k += steps) {
         data[k] = DataPoint(probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k), k);
     }
-    const char* renamed_filename = std::string(filename).append("_vark.csv").data();
+    std::string renamed_filename = std::string(filename).append("_vark.csv");
     save_data(renamed_filename, data, K);
 }
