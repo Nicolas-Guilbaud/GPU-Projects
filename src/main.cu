@@ -9,8 +9,8 @@ int main(int argc, char** argv) {
 
     CLI::App app{ "Bitwise XOR" };
 
-    bool is_double,
-        is_float;
+    bool is_double = false,
+        is_float = false;
     
     int max_array_size = 1,
         step_size = 1,
