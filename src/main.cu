@@ -24,18 +24,18 @@ int main(int argc, char** argv) {
     std::string output_filename = "output";
     Metric metric_choice = Metric::avg;
     
-    app.add_option("-t, --thread", thread_size, "number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
-    app.add_option("-m, --Metric", metric_choice, "Metric to use for performance measurement (avg or median)")->check(CLI::IsMember({ "avg", "median" }));
+    app.add_option("-t, --thread", thread_size, "Maximal number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
+    app.add_option("-m, --metric", metric_choice, "Metric to use for performance measurement (avg or median, default is avg)")->check(CLI::IsMember({ "avg", "median" }));
     
-    app.add_option("-n, --max_value", max_array_size, "upper bound on the array size(default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("-i, --iterations", num_iterations, "number of iterations to run for performance measurement");
-    app.add_option("-j, --J", J, "Size of the number of operations to perform in the kernel (default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("-k, --K", K, "Size of the number of operations to perform in the kernel (default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("-o, --output", output_filename, "output file name for performance results");
+    app.add_option("-n, --max_size", max_array_size, "Upper bound on the array size (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("-i, --iterations", num_iterations, "Number of times to probe the measurements (default is 1)");
+    app.add_option("-j, --J", J, "Number of elements per threads to process (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("-k, --K", K, "Number of operations per threads to process (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("-o, --output", output_filename, "Generic name for the csv output files (default is 'output')");
     
-    app.add_option("-s, --step", step_size, "step size for array size (default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("--step_j", step_j, "step size for j size (default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("--step_k", step_k, "step size for k size (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("-s, --step", step_size, "The steps for the array size (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("--step_j", step_j, "The steps for the number of elements per threads (default is 1)")->check(CLI::PositiveNumber);
+    app.add_option("--step_k", step_k, "The steps for the number of operations per threads (default is 1)")->check(CLI::PositiveNumber);
     
 
     app.add_flag("-d, --double", is_double, "Run the benchmarks with the double data type");
