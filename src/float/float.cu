@@ -24,6 +24,8 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
 
     cudaEvent_t start_gpu, end_gpu;
 
+    int iter = 0;
+
     cudaEventCreate(&start_gpu);
     cudaEventCreate(&end_gpu);
 
@@ -33,7 +35,7 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
     CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
     CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
 
-    for (int iter = 0; iter < nb_iterations; iter++) {
+    do {
 
         for (int i = 0; i < array_size; i++) {
             host_a[i] = rand();
@@ -68,7 +70,12 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         // Make sure the stop_gpu event is recorded before doing the time computation
         CHK(cudaEventSynchronize(end_gpu));
         CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
-    }
+
+        //Ensure computational time is not negative
+        if(gpu_runtimes[iter] >= 0.0f){
+            iter++;
+        }
+    }while(iter < nb_iterations);
 
 Error:
     cudaFree(dev_c);
