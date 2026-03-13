@@ -54,14 +54,14 @@ public:
     };
 };
 
-void save_data(std::string filename, const DataPoint* time, int N) {
+void save_data(std::string filename, const DataPoint* time, int N, int step_size) {
     std::ofstream fout;
     fout.open(filename);
     if (!fout.good()) {
         printf("Could not open %s !", filename.c_str());
     }
 
-    for (int i = 1; i < N; i++) {
+    for (int i = 1; i < N; i+=step_size) {
         fout << time[i].to_csv() << "\n";
     }
     fout.close();

@@ -75,7 +75,7 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
 
         //Ensure computational time is not negative
-        if(gpu_runtimes[iter] >= 0.0f){
+        if(gpu_runtimes[iter] > 0.0f){
             iter++;
         }
     }while(iter < nb_iterations);
@@ -109,7 +109,7 @@ void benchmark_varsize_double(
         data[i] = DataPoint(probe_kernel_double(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K), i);
     }
     std::string renamed_filename = std::string(filename).append("_varsize.csv");
-    save_data(renamed_filename, data, max_size);
+    save_data(renamed_filename, data, max_size,steps);
 }
 
 void benchmark_varj_double(
@@ -127,7 +127,7 @@ void benchmark_varj_double(
         data[j] = DataPoint(probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K), j);
     }
     std::string renamed_filename = std::string(filename).append("_varj.csv");
-    save_data(renamed_filename, data, J);
+    save_data(renamed_filename, data, J,steps);
 }
 
 void benchmark_vark_double(
@@ -145,5 +145,5 @@ void benchmark_vark_double(
         data[k] = DataPoint(probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k), k);
     }
     std::string renamed_filename = std::string(filename).append("_vark.csv");
-    save_data(renamed_filename, data, K);
+    save_data(renamed_filename, data, K,steps);
 }
