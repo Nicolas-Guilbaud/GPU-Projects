@@ -40,17 +40,17 @@ enum class Metric {
 
 class DataPoint {
 public:
-    float y;
     int x;
+    float time, bandwith;
 
     DataPoint() = default;
 
-    DataPoint(float value, int x_axis)
-        : y(value), x(x_axis) {
+    DataPoint( int x_axis, float time_value, float bw_value)
+        : x(x_axis), time(time_value), bandwith(bw_value) {
     }
 
     std::string to_csv() const {
-        return std::to_string(y) + "," + std::to_string(x);
+        return std::to_string(x) + "," + std::to_string(time) + "," + std::to_string(bandwith);
     };
 };
 
