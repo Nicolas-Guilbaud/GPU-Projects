@@ -5,16 +5,26 @@ import os
 def plot_data(filename: str, xlabel:str, title:str):
     # Load the data from the CSV file
     full_path = os.path.join(os.getcwd(), 'results', filename)
-    data = pd.read_csv(full_path, header=None, names=['Time', xlabel])
-    
-    # Plotting
+    data = pd.read_csv(full_path, header=None, names=[xlabel,'Time','Bandwidth'])
+    print(data)
+
+    # Plotting time:
     plt.figure(figsize=(10, 6))
     plt.plot(data[xlabel], data['Time'])
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel('Time (ms)')
     plt.grid(True)
-    plt.savefig(full_path.replace('.csv', '.png'))
+    plt.savefig(full_path.replace('.csv', '_time.png'))
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(data[xlabel], data['Bandwidth'])
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel('Bandwidth (GB/s)')
+    plt.grid(True)
+    plt.savefig(full_path.replace('.csv', '_bw.png'))
     plt.show()
     
 if __name__ == "__main__":
