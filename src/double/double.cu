@@ -107,7 +107,7 @@ void benchmark_varsize_double(
 
     for (int i = 1; i < max_size; i += steps) {
         float time = probe_kernel_double(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K);
-        float bandwidth = 3*sizeof(double)*i/time;
+        float bandwidth = 3*sizeof(double)*i/(time*pow(10,6));
         data[i] = DataPoint(i,time,bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_varsize.csv");
@@ -127,7 +127,7 @@ void benchmark_varj_double(
 
     for (int j = 1; j < J; j += steps) {
         float time = probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K);
-        float bandwidth = 3*sizeof(double)*DEFAULT_ARRAY_SIZE/time;
+        float bandwidth = 3*sizeof(double)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
         data[j] = DataPoint(j,time,bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_varj.csv");
@@ -147,7 +147,7 @@ void benchmark_vark_double(
 
     for (int k = 1; k < K; k += steps) {
         float time = probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k);
-        float bandwidth = 3*sizeof(double)*DEFAULT_ARRAY_SIZE/time;
+        float bandwidth = 3*sizeof(double)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
         data[k] = DataPoint(k,time,bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_vark.csv");
