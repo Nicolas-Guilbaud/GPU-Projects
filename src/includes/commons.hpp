@@ -16,7 +16,7 @@
     } while (0)
 
 
-const int DEFAULT_ARRAY_SIZE = 1024,
+const int DEFAULT_ARRAY_SIZE = 4096,
     DEFAULT_THREAD_SIZE = 1024,
     DEFAULT_J = 1,
     DEFAULT_ITERATIONS = 1,

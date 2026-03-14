@@ -147,7 +147,7 @@ void benchmark_vark_double(
 
     for (int k = 1; k < K; k += steps) {
         float time = probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k);
-        float bandwidth = 3*sizeof(double)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
+        float bandwidth = k*3*sizeof(double)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
         data[k] = DataPoint(k,time,bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_vark.csv");
