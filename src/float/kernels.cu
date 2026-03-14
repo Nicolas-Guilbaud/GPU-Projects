@@ -5,8 +5,8 @@ union bin_float {
 
 __global__ void float_bitwiseXOR_kernel_k(float* c, const float* a, const float* b, const int N, const int K) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    for (int k = 0; k < K; k++) {
-        if (idx < N) {
+    if (idx < N) {
+        for (int k = 0; k < K; k++) {
             bin_float bin_a, bin_b, bin_c;
             bin_a.value = a[idx];
             bin_b.value = b[idx];
@@ -18,14 +18,12 @@ __global__ void float_bitwiseXOR_kernel_k(float* c, const float* a, const float*
 
 __global__ void float_bitwiseXOR_kernel_j(float* c, const float* a, const float* b, const int N, const int J) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    for (int j = 0; j < J; j++) {
-        if (idx + j < N) {
-            bin_float bin_a, bin_b, bin_c;
-            bin_a.value = a[idx + j];
-            bin_b.value = b[idx + j];
-            bin_c.binary = bin_a.binary ^ bin_b.binary;
-            c[idx + j] = bin_c.value;
-        }
+    for (int j = 0; j < J && idx + j < N; ++j) {
+        bin_float bin_a, bin_b, bin_c;
+        bin_a.value = a[idx + j];
+        bin_b.value = b[idx + j];
+        bin_c.binary = bin_a.binary ^ bin_b.binary;
+        c[idx + j] = bin_c.value;
     }
 }
 

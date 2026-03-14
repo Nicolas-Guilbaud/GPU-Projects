@@ -30,10 +30,8 @@ __global__ void xor_double_multiple(
 ){
 
     int idx = threadIdx.x + blockDim.x * blockIdx.x;
-    if(idx < N){
-        for(int j = 0; j < nb_elem; j++){
-            res[idx+j].binary = left[idx+j].binary ^ right[idx+j].binary;
-        }
+    for(int j = 0; j < nb_elem && idx + j < N; ++j){
+        res[idx+j].binary = left[idx+j].binary ^ right[idx+j].binary;
     }
 }
 
