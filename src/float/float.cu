@@ -11,13 +11,13 @@ using std::rand;
 
 float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_iterations, int J, int K) {
 
-    float
+    bin_float
         //GPU arrays
         * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
-        host_a[array_size], host_b[array_size], host_c[array_size],
-        //array of time
-        gpu_runtimes[nb_iterations];
+        host_a[array_size], host_b[array_size], host_c[array_size];
+    //array of time
+    float gpu_runtimes[nb_iterations];
     int total_threads_needed = div_up(array_size,J);
 
     dim3 block_size(div_up(total_threads_needed, thread_nb));
@@ -32,19 +32,19 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
 
     CHK(cudaSetDevice(0));
 
-    CHK(cudaMalloc((void**)&dev_c, array_size * sizeof(float)));
-    CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(float)));
-    CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(float)));
+    CHK(cudaMalloc((void**)&dev_c, array_size * sizeof(bin_float)));
+    CHK(cudaMalloc((void**)&dev_a, array_size * sizeof(bin_float)));
+    CHK(cudaMalloc((void**)&dev_b, array_size * sizeof(bin_float)));
 
     do {
 
         for (int i = 0; i < array_size; i++) {
-            host_a[i] = rand();
-            host_b[i] = rand();
+            host_a[i].value = rand();
+            host_b[i].value = rand();
         }
 
-        CHK(cudaMemcpy(dev_a, host_a, array_size * sizeof(float), cudaMemcpyHostToDevice));
-        CHK(cudaMemcpy(dev_b, host_b, array_size * sizeof(float), cudaMemcpyHostToDevice));
+        CHK(cudaMemcpy(dev_a, host_a, array_size * sizeof(bin_float), cudaMemcpyHostToDevice));
+        CHK(cudaMemcpy(dev_b, host_b, array_size * sizeof(bin_float), cudaMemcpyHostToDevice));
         if (J > 1) {
             cudaEventRecord(start_gpu);
             float_bitwiseXOR_kernel_j<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, J);

@@ -3,37 +3,25 @@ union bin_float {
     u_int32_t binary;
 };
 
-__global__ void float_bitwiseXOR_kernel_k(float* c, const float* a, const float* b, const int N, const int K) {
+__global__ void float_bitwiseXOR_kernel_k(bin_float* c, const bin_float* a, const bin_float* b, const int N, const int K) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N) {
         for (int k = 0; k < K; k++) {
-            bin_float bin_a, bin_b, bin_c;
-            bin_a.value = a[idx];
-            bin_b.value = b[idx];
-            bin_c.binary = bin_a.binary ^ bin_b.binary;
-            c[idx] = bin_c.value;
+            c[idx].binary = a[idx].binary ^ b[idx].binary;
         }
     }
 }
 
-__global__ void float_bitwiseXOR_kernel_j(float *__restrict__ c, const float *__restrict__ a, const float *__restrict__ b, const int N, const int J) {
+__global__ void float_bitwiseXOR_kernel_j(bin_float *__restrict__ c, const bin_float *__restrict__ a, const bin_float *__restrict__ b, const int N, const int J) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     for (int j = 0; j < J && idx + j < N; ++j) {
-        bin_float bin_a, bin_b, bin_c;
-        bin_a.value = a[idx + j];
-        bin_b.value = b[idx + j];
-        bin_c.binary = bin_a.binary ^ bin_b.binary;
-        c[idx + j] = bin_c.value;
+        c[idx+j].binary = a[idx+j].binary ^ b[idx+j].binary;
     }
 }
 
-__global__ void float_bitwiseXOR_kernel(float* c, const float* a, const float* b, const int N) {
+__global__ void float_bitwiseXOR_kernel(bin_float* c, const bin_float* a, const bin_float* b, const int N) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N) {
-        bin_float bin_a, bin_b, bin_c;
-        bin_a.value = a[idx];
-        bin_b.value = b[idx];
-        bin_c.binary = bin_a.binary ^ bin_b.binary;
-        c[idx] = bin_c.value;
+        c[idx].binary = a[idx].binary ^ b[idx].binary;
     }
 }
