@@ -16,7 +16,7 @@ __global__ void float_bitwiseXOR_kernel_k(float* c, const float* a, const float*
     }
 }
 
-__global__ void float_bitwiseXOR_kernel_j(float* c, const float* a, const float* b, const int N, const int J) {
+__global__ void float_bitwiseXOR_kernel_j(float *__restrict__ c, const float *__restrict__ a, const float *__restrict__ b, const int N, const int J) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     for (int j = 0; j < J && idx + j < N; ++j) {
         bin_float bin_a, bin_b, bin_c;

@@ -22,9 +22,9 @@ __global__ void xor_double_mono(bin_double* res, bin_double* left, bin_double* r
  * Compute 1 binary operation as double, multiple elements/thread
  */
 __global__ void xor_double_multiple(
-    bin_double *res, 
-    const bin_double *left, 
-    const bin_double *right,
+    bin_double *__restrict__ res, 
+    const bin_double *__restrict__ left, 
+    const bin_double *__restrict__ right,
     size_t N,
     size_t nb_elem
 ){

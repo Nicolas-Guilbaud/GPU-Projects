@@ -18,10 +18,10 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         host_a[array_size], host_b[array_size], host_c[array_size],
         //array of time
         gpu_runtimes[nb_iterations];
-    int group_thread_nb = div_up(thread_nb, J);
+    int total_threads_needed = div_up(array_size,J);
 
-    dim3 block_size(div_up(array_size, thread_nb));
-    dim3 thread_size(group_thread_nb);
+    dim3 block_size(div_up(total_threads_needed, thread_nb));
+    dim3 thread_size(thread_nb);
 
     cudaEvent_t start_gpu, end_gpu;
 
