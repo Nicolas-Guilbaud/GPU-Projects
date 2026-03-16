@@ -38,14 +38,14 @@
             "program": "${workspaceFolder}/build/main",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-n 1",
-                "-s 1",
+                "-n 1000000",
+                "-s 10000",
                 "-i 1",
-                "-j 400",
-                "-k 400",
-                " --step_j=100",
-                " --step_k=100",
-                "-fd",
+                "-j 40000",
+                "-k 40000",
+                "-a 1000",
+                "-c 1000",
+                "-fd"
             ]
         }
     ]
