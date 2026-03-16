@@ -25,10 +25,10 @@ int main(int argc, char** argv) {
     Metric metric_choice = Metric::avg;
 
     app.add_option("-t, --thread", thread_size, "Maximal number of threads per block (default is 1024)")->check(CLI::PositiveNumber);
-    app.add_option("-m, --metric", metric_choice, "Metric to use for performance measurement (avg or median, default is avg)")->check(CLI::IsMember({ "avg", "median" }));
+    // app.add_option("-m, --metric", metric_choice, "Metric to use for performance measurement (avg or median, default is avg)")->required()->transform(CLI::CheckedTransformer(metric_map, CLI::ignore_case));
 
     app.add_option("-n, --max_size", max_array_size, "Upper bound on the array size (default is 1)")->check(CLI::PositiveNumber);
-    app.add_option("-i, --iterations", num_iterations, "Number of times to probe the measurements (default is 1)");
+    app.add_option("-i, --iterations", num_iterations, "Number of times to probe the measurements (default is 1)")->check(CLI::PositiveNumber);
     app.add_option("-j, --J", J, "Number of elements per threads to process (default is 1)")->check(CLI::PositiveNumber);
     app.add_option("-k, --K", K, "Number of operations per threads to process (default is 1)")->check(CLI::PositiveNumber);
     app.add_option("-o, --output", output_filename, "Generic name for the csv output files (default is 'output')");
@@ -53,6 +53,8 @@ int main(int argc, char** argv) {
         float_filename.append(output_filename);
         printf("File: %s\n", float_filename.c_str());
         if (max_array_size > 1) {
+            printf("Benchmarking variable array size...\n");
+            printf("iterations: %d\n", num_iterations);
             benchmark_varsize_float(max_array_size, step_size, thread_size, metric_choice, num_iterations, float_filename);
         }
         if (J > 1) {

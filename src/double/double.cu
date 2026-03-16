@@ -18,7 +18,7 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         * host_c = new bin_double[array_size];
 
     //array of time
-    float gpu_runtimes[nb_iterations];
+    float gpu_runtimes[nb_iterations] = { 0.0f };
 
     int total_threads_needed = div_up(array_size, J);
     size_t vec_size = array_size * sizeof(bin_double);
@@ -69,11 +69,11 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         // cudaDeviceSynchronize waits for the kernel to finish, and returns
         // any errors encountered during the launch.
         CHK(cudaDeviceSynchronize());
+        CHK(cudaEventSynchronize(end_gpu));
+        CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
         CHK(cudaMemcpy(host_c, dev_c, vec_size, cudaMemcpyDeviceToHost));
 
         // Make sure the stop_gpu event is recorded before doing the time computation
-        CHK(cudaEventSynchronize(end_gpu));
-        CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
 
         //Ensure computational time is not negative
         if (gpu_runtimes[iter] > 0.0f) {
