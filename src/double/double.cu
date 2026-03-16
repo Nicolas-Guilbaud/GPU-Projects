@@ -13,7 +13,9 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         //GPU arrays
         * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
-        host_a[array_size], host_b[array_size], host_c[array_size];
+        *host_a = new bin_double[array_size], 
+        *host_b = new bin_double[array_size], 
+        *host_c = new bin_double[array_size];
     
     //array of time
     float gpu_runtimes[nb_iterations];
@@ -84,6 +86,10 @@ Error:
     cudaFree(dev_a);
     cudaFree(dev_b);
 
+    delete[] host_a;
+    delete[] host_b;
+    delete[] host_c;
+
     cudaError_t status = cudaGetLastError();
     if (status != cudaSuccess) {
         fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(status));
@@ -142,7 +148,7 @@ void benchmark_vark_double(
     std::string filename
 ) {
 
-    DataPoint data[K];
+    DataPoint *data = new DataPoint[K];
 
     for (int k = 1; k < K; k += steps) {
         float time = probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k);
@@ -151,4 +157,6 @@ void benchmark_vark_double(
     }
     std::string renamed_filename = std::string(filename).append("_vark.csv");
     save_data(renamed_filename, data, K,steps);
+
+    delete[] data;
 }

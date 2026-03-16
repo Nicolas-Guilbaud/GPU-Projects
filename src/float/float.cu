@@ -15,7 +15,9 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         //GPU arrays
         * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
-        host_a[array_size], host_b[array_size], host_c[array_size];
+        *host_a = new bin_float[array_size], 
+        *host_b = new bin_float[array_size], 
+        *host_c = new bin_float[array_size];
     //array of time
     float gpu_runtimes[nb_iterations];
     int total_threads_needed = div_up(array_size,J);
@@ -83,6 +85,10 @@ Error:
     cudaFree(dev_a);
     cudaFree(dev_b);
 
+    delete[] host_a;
+    delete[] host_b;
+    delete[] host_c;
+
     cudaError_t status = cudaGetLastError();
     if (status != cudaSuccess) {
         fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(status));
@@ -101,7 +107,7 @@ void benchmark_varsize_float(
     std::string filename
 ) {
 
-    DataPoint data[max_size];
+    DataPoint *data = new DataPoint[max_size];
 
     for (int i = 1; i < max_size; i += steps) {
         float time = probe_kernel(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K);
@@ -111,6 +117,7 @@ void benchmark_varsize_float(
     std::string renamed_filename = filename.append("_varsize.csv");
     printf("File: %s\n",renamed_filename.c_str());
     save_data(renamed_filename, data, max_size,steps);
+    delete[] data;
 }
 
 void benchmark_varj_float(
