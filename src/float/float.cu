@@ -15,12 +15,12 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         //GPU arrays
         * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
-        *host_a = new bin_float[array_size], 
-        *host_b = new bin_float[array_size], 
-        *host_c = new bin_float[array_size];
+        * host_a = new bin_float[array_size],
+        * host_b = new bin_float[array_size],
+        * host_c = new bin_float[array_size];
     //array of time
     float gpu_runtimes[nb_iterations];
-    int total_threads_needed = div_up(array_size,J);
+    int total_threads_needed = div_up(array_size, J);
 
     dim3 block_size(div_up(total_threads_needed, thread_nb));
     dim3 thread_size(thread_nb);
@@ -49,7 +49,7 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         CHK(cudaMemcpy(dev_b, host_b, array_size * sizeof(bin_float), cudaMemcpyHostToDevice));
         if (J > 1) {
             cudaEventRecord(start_gpu);
-            float_bitwiseXOR_kernel_j<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, J);
+            float_bitwiseXOR_kernel_j << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size, J);
             cudaEventRecord(end_gpu);
         }
         else if (K > 1) {
@@ -75,10 +75,10 @@ float probe_kernel(int array_size, int thread_nb, Metric metric_choice, int nb_i
         CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
 
         //Ensure computational time is not negative
-        if(gpu_runtimes[iter] > 0.0f){
+        if (gpu_runtimes[iter] > 0.0f) {
             iter++;
         }
-    }while(iter < nb_iterations);
+    } while (iter < nb_iterations);
 
 Error:
     cudaFree(dev_c);
@@ -107,16 +107,16 @@ void benchmark_varsize_float(
     std::string filename
 ) {
 
-    DataPoint *data = new DataPoint[max_size];
+    DataPoint* data = new DataPoint[max_size];
 
     for (int i = 1; i < max_size; i += steps) {
         float time = probe_kernel(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K);
-        float bandwidth = 3*sizeof(float)*i/(time*pow(10,6));
+        float bandwidth = 3 * sizeof(float) * i / (time * pow(10, 6));
         data[i] = DataPoint(i, time, bandwidth);
     }
     std::string renamed_filename = filename.append("_varsize.csv");
-    printf("File: %s\n",renamed_filename.c_str());
-    save_data(renamed_filename, data, max_size,steps);
+    printf("File: %s\n", renamed_filename.c_str());
+    save_data_add(renamed_filename, data, max_size, steps);
     delete[] data;
 }
 
@@ -129,15 +129,16 @@ void benchmark_varj_float(
     std::string filename
 ) {
 
-    DataPoint data[J];
+    DataPoint* data = new DataPoint[J];
 
     for (int j = 1; j < J; j += steps) {
         float time = probe_kernel(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K);
-        float bandwidth = 3*sizeof(float)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
-        data[j] = DataPoint(j,time,bandwidth);
+        float bandwidth = 3 * sizeof(float) * DEFAULT_ARRAY_SIZE / (time * pow(10, 6));
+        data[j] = DataPoint(j, time, bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_varj.csv");
-    save_data(renamed_filename, data, J,steps);
+    save_data_add(renamed_filename, data, J, steps);
+    delete[] data;
 }
 
 void benchmark_vark_float(
@@ -149,13 +150,14 @@ void benchmark_vark_float(
     std::string filename
 ) {
 
-    DataPoint data[K];
+    DataPoint* data = new DataPoint[K];
 
     for (int k = 1; k < K; k += steps) {
         float time = probe_kernel(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k);
-        float bandwidth = k*3*sizeof(float)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
-        data[k] = DataPoint(k,time,bandwidth);
+        float bandwidth = k * 3 * sizeof(float) * DEFAULT_ARRAY_SIZE / (time * pow(10, 6));
+        data[k] = DataPoint(k, time, bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_vark.csv");
-    save_data(renamed_filename, data, K,steps);
+    save_data_add(renamed_filename, data, K, steps);
+    delete[] data;
 }

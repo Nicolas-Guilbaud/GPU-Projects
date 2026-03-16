@@ -16,11 +16,11 @@
     } while (0)
 
 
-const int DEFAULT_ARRAY_SIZE = 4096,
-    DEFAULT_THREAD_SIZE = 1024,
-    DEFAULT_J = 1,
-    DEFAULT_ITERATIONS = 1,
-    DEFAULT_K = 1;
+const int DEFAULT_ARRAY_SIZE = 400000,
+DEFAULT_THREAD_SIZE = 1024,
+DEFAULT_J = 1,
+DEFAULT_ITERATIONS = 1,
+DEFAULT_K = 1;
 
 /**
  *  Upper bound division
@@ -45,7 +45,7 @@ public:
 
     DataPoint() = default;
 
-    DataPoint( int x_axis, float time_value, float bw_value)
+    DataPoint(int x_axis, float time_value, float bw_value)
         : x(x_axis), time(time_value), bandwith(bw_value) {
     }
 
@@ -54,20 +54,32 @@ public:
     };
 };
 
-void save_data(std::string filename, const DataPoint* time, int N, int step_size) {
+void save_data_mul(std::string filename, const DataPoint* time, int N, int step_size) {
     std::ofstream fout;
     fout.open(filename);
     if (!fout.good()) {
         printf("Could not open %s !", filename.c_str());
     }
 
-    for (int i = 1; i < N; i+=step_size) {
+    for (int i = 1; i < N; i *= step_size) {
         fout << time[i].to_csv() << "\n";
     }
     fout.close();
 
 }
+void save_data_add(std::string filename, const DataPoint* time, int N, int step_size) {
+    std::ofstream fout;
+    fout.open(filename);
+    if (!fout.good()) {
+        printf("Could not open %s !", filename.c_str());
+    }
 
+    for (int i = 1; i < N; i += step_size) {
+        fout << time[i].to_csv() << "\n";
+    }
+    fout.close();
+
+}
 /**
  * Computes the median value of an array
  */

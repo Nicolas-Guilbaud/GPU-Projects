@@ -13,15 +13,15 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         //GPU arrays
         * dev_a = 0, * dev_b = 0, * dev_c = 0,
         //host arrays
-        *host_a = new bin_double[array_size], 
-        *host_b = new bin_double[array_size], 
-        *host_c = new bin_double[array_size];
-    
+        * host_a = new bin_double[array_size],
+        * host_b = new bin_double[array_size],
+        * host_c = new bin_double[array_size];
+
     //array of time
     float gpu_runtimes[nb_iterations];
 
-    int total_threads_needed = div_up(array_size,J);
-    size_t vec_size = array_size * sizeof(float);
+    int total_threads_needed = div_up(array_size, J);
+    size_t vec_size = array_size * sizeof(bin_double);
 
     dim3 block_size(div_up(total_threads_needed, thread_nb));
     dim3 thread_size(thread_nb);
@@ -50,17 +50,17 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         CHK(cudaMemcpy(dev_b, host_b, vec_size, cudaMemcpyHostToDevice));
         if (J > 1) {
             cudaEventRecord(start_gpu);
-            xor_double_multiple<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, J);
+            xor_double_multiple << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size, J);
             cudaEventRecord(end_gpu);
         }
         else if (K > 1) {
             cudaEventRecord(start_gpu);
-            xor_double_repeated<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size, K);
+            xor_double_repeated << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size, K);
             cudaEventRecord(end_gpu);
         }
         else {
             cudaEventRecord(start_gpu);
-            xor_double_mono<<<block_size, thread_size>>>(dev_c, dev_a, dev_b, array_size);
+            xor_double_mono << <block_size, thread_size >> > (dev_c, dev_a, dev_b, array_size);
             cudaEventRecord(end_gpu);
         }
 
@@ -76,10 +76,10 @@ float probe_kernel_double(int array_size, int thread_nb, Metric metric_choice, i
         CHK(cudaEventElapsedTime(&gpu_runtimes[iter], start_gpu, end_gpu));
 
         //Ensure computational time is not negative
-        if(gpu_runtimes[iter] > 0.0f){
+        if (gpu_runtimes[iter] > 0.0f) {
             iter++;
         }
-    }while(iter < nb_iterations);
+    } while (iter < nb_iterations);
 
 Error:
     cudaFree(dev_c);
@@ -108,15 +108,16 @@ void benchmark_varsize_double(
     std::string filename
 ) {
 
-    DataPoint data[max_size];
+    DataPoint* data = new DataPoint[max_size];
 
     for (int i = 1; i < max_size; i += steps) {
         float time = probe_kernel_double(i, thread_size, choice, nb_iter, DEFAULT_J, DEFAULT_K);
-        float bandwidth = 3*sizeof(double)*i/(time*pow(10,6));
-        data[i] = DataPoint(i,time,bandwidth);
+        float bandwidth = 3 * sizeof(double) * i / (time * pow(10, 6));
+        data[i] = DataPoint(i, time, bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_varsize.csv");
-    save_data(renamed_filename, data, max_size,steps);
+    save_data_add(renamed_filename, data, max_size, steps);
+    delete[] data;
 }
 
 void benchmark_varj_double(
@@ -128,15 +129,16 @@ void benchmark_varj_double(
     std::string filename
 ) {
 
-    DataPoint data[J];
+    DataPoint* data = new DataPoint[J];
 
     for (int j = 1; j < J; j += steps) {
         float time = probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, j, DEFAULT_K);
-        float bandwidth = 3*sizeof(double)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
-        data[j] = DataPoint(j,time,bandwidth);
+        float bandwidth = 3 * sizeof(double) * DEFAULT_ARRAY_SIZE / (time * pow(10, 6));
+        data[j] = DataPoint(j, time, bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_varj.csv");
-    save_data(renamed_filename, data, J,steps);
+    save_data_add(renamed_filename, data, J, steps);
+    delete[] data;
 }
 
 void benchmark_vark_double(
@@ -148,15 +150,15 @@ void benchmark_vark_double(
     std::string filename
 ) {
 
-    DataPoint *data = new DataPoint[K];
+    DataPoint* data = new DataPoint[K];
 
     for (int k = 1; k < K; k += steps) {
         float time = probe_kernel_double(DEFAULT_ARRAY_SIZE, thread_size, choice, nb_iter, DEFAULT_J, k);
-        float bandwidth = k*3*sizeof(double)*DEFAULT_ARRAY_SIZE/(time*pow(10,6));
-        data[k] = DataPoint(k,time,bandwidth);
+        float bandwidth = k * 3 * sizeof(double) * DEFAULT_ARRAY_SIZE / (time * pow(10, 6));
+        data[k] = DataPoint(k, time, bandwidth);
     }
     std::string renamed_filename = std::string(filename).append("_vark.csv");
-    save_data(renamed_filename, data, K,steps);
+    save_data_add(renamed_filename, data, K, steps);
 
     delete[] data;
 }

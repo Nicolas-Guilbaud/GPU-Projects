@@ -9,7 +9,7 @@
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/main",
-            "cwd" : "${workspaceFolder}",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "-n 1000000",
                 "-s 200000",
@@ -21,7 +21,7 @@
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/main",
-            "cwd" : "${workspaceFolder}",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "-n 5000",
                 "-s 100",
@@ -36,13 +36,15 @@
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/main",
-            "cwd" : "${workspaceFolder}",
+            "cwd": "${workspaceFolder}",
             "args": [
-                "-n 10000000",
-                "-s 1000",
-                "-i 10",
-                "-j 16384",
-                "-k 16384",
+                "-n 1",
+                "-s 1",
+                "-i 1",
+                "-j 400",
+                "-k 400",
+                " --step_j=100",
+                " --step_k=100",
                 "-fd",
             ]
         }
