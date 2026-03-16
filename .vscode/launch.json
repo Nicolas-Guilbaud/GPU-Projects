@@ -11,11 +11,8 @@
             "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
-                "-n 5000",
-                "-s 100",
-                "-i 10",
-                "-j 4096",
-                "-k 4096",
+                "-n 1000000",
+                "-s 200000",
                 "-f"
             ]
         },
@@ -41,11 +38,11 @@
             "program": "${workspaceFolder}/build/main",
             "cwd" : "${workspaceFolder}",
             "args": [
-                "-n 50000",
-                "-s 100",
+                "-n 10000000",
+                "-s 1000",
                 "-i 10",
-                "-j 4096",
-                "-k 4096",
+                "-j 16384",
+                "-k 16384",
                 "-fd",
             ]
         }
