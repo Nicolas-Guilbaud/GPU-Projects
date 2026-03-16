@@ -12,10 +12,10 @@ __global__ void float_bitwiseXOR_kernel_k(bin_float* c, const bin_float* a, cons
     }
 }
 
-__global__ void float_bitwiseXOR_kernel_j(bin_float *__restrict__ c, const bin_float *__restrict__ a, const bin_float *__restrict__ b, const int N, const int J) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void float_bitwiseXOR_kernel_j(bin_float* __restrict__ c, const bin_float* __restrict__ a, const bin_float* __restrict__ b, const int N, const int J) {
+    int idx = (blockIdx.x * blockDim.x + threadIdx.x) * J;
     for (int j = 0; j < J && idx + j < N; ++j) {
-        c[idx+j].binary = a[idx+j].binary ^ b[idx+j].binary;
+        c[idx + j].binary = a[idx + j].binary ^ b[idx + j].binary;
     }
 }
 

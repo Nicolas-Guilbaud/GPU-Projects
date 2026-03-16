@@ -53,8 +53,6 @@ int main(int argc, char** argv) {
         float_filename.append(output_filename);
         printf("File: %s\n", float_filename.c_str());
         if (max_array_size > 1) {
-            printf("Benchmarking variable array size...\n");
-            printf("iterations: %d\n", num_iterations);
             benchmark_varsize_float(max_array_size, step_size, thread_size, metric_choice, num_iterations, float_filename);
         }
         if (J > 1) {

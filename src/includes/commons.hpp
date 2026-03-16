@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <fstream>
 #include <utility>
+#include <algorithm>
 
 #define CHK(code)                                                    \
     do                                                               \
@@ -84,6 +85,7 @@ void save_data_add(std::string filename, const DataPoint* time, int N, int step_
  * Computes the median value of an array
  */
 float compute_median(float* values, size_t nb_iter) {
+    std::sort(values, values + nb_iter);
     int mid = nb_iter / 2;
     if (nb_iter % 2 == 0) {
         return (values[mid - 1] + values[mid]) / 2.0;
