@@ -37,8 +37,8 @@ A summary of the arguments are found in the following table:
 | --K          | -k          | Number of operations per threads to process               | 1             |
 | --output     | -o          | Generic name for the csv output files                     | "output"      |
 | --steps      | -s          | The steps for the array size                              | 1             |
-| --step_j     |             | The steps for the number of elements per threads          | 1             |
-| --step_k     |             | The steps for the number of operations per threads        | 1             |
+| --step_j     | -a          | The steps for the number of elements per threads          | 1             |
+| --step_k     | -c          | The steps for the number of operations per threads        | 1             |
 | --double     | -d          | Run the benchmarks with the double data type              |               |
 | --float      | -f          | Run the benchmarks with the float data type               |               |
 
